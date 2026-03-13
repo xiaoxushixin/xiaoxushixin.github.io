@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>紫微星阁 · 在线命理测算</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&display=swap');
+
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --gold-dark: #8b6914;
+    --bg-dark: #0d0a06;
+    --bg-card: #1a1408;
+    --bg-card2: #221c0e;
+    --red: #c0392b;
+    --text: #e8d5a3;
+    --text-dim: #9a8660;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Serif SC', 'SimSun', serif;
+    background: var(--bg-dark);
+    color: var(--text);
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(139,105,20,0.05) 0%, transparent 60%);
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    text-align: center;
+    padding: 50px 20px 30px;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    background: linear-gradient(180deg, rgba(201,168,76,0.08) 0%, transparent 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '☯';
+    position: absolute;
+    font-size: 300px;
+    opacity: 0.02;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: rotateSlow 60s linear infinite;
+  }
+  @keyframes rotateSlow { from { transform: translateX(-50%) rotate(0deg); } to { transform: translateX(-50%) rotate(360deg); } }
+
+  .logo-symbol {
+    font-size: 48px;
+    color: var(--gold);
+    margin-bottom: 10px;
+    display: block;
+  }
+  header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.3em;
+    margin-bottom: 8px;
+  }
+  header p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+  }
+
+  /* ===== NAV TABS ===== */
+  .nav-tabs {
+    display: flex;
+    gap: 10px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .nav-tab {
+    background: var(--bg-card);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 8px;
+    padding: 12px 24px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
+  }
+  .nav-tab:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .nav-tab.active {
+    background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.1));
+    border-color: var(--gold);
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* ===== MAIN ===== */
+  main { max-width: 1000px; margin: 0 auto; padding: 30px 20px 60px; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ===== FORM CARD ===== */
+  .form-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 12px;
+    padding: 36px;
+    margin-bottom: 30px;
+    position: relative;
+  }
+  .form-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    border-radius: 12px 12px 0 0;
+  }
+  .form-title {
+    font-size: 1.15rem;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr 1fr; } }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    background: rgba(201,168,76,0.05);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+    -webkit-appearance: none;
+  }
+  .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(201,168,76,0.1);
+  }
+  .form-group select option { background: #221c0e; }
+
+  .btn-calc {
+    margin-top: 24px;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-dark));
+    border: none;
+    border-radius: 8px;
+    color: #0d0a06;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    cursor: pointer;
+    transition: opacity 0.3s, transform 0.1s;
+  }
+  .btn-calc:hover { opacity: 0.9; }
+  .btn-calc:active { transform: scale(0.99); }
+
+  /* ===== RESULTS ===== */
+  .results-box { display: none; }
+
+  .section-title {
+    font-size: 1.1rem;
+    color: var(--gold);
+    letter-spacing: 0.25em;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(201,168,76,0.4), transparent);
+  }
+
+  /* 四柱 */
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+  @media (max-width: 500px) { .pillars-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .pillar-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px;
+    padding: 20px 12px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .pillar-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .pillar-label {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    margin-bottom: 14px;
+  }
+  .pillar-stem {
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .pillar-branch {
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .pillar-element {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.1em;
+    margin: 2px;
+  }
+  .pillar-shengxiao {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+
+  /* 五行颜色 */
+  .wood  { color: #5cb85c; }
+  .fire  { color: #e74c3c; }
+  .earth { color: #c9a84c; }
+  .metal { color: #95a5a6; }
+  .water { color: #3498db; }
+  .bg-wood  { background: rgba(92,184,92,0.15); border: 1px solid rgba(92,184,92,0.3); color: #5cb85c; }
+  .bg-fire  { background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3); color: #e74c3c; }
+  .bg-earth { background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3); color: #c9a84c; }
+  .bg-metal { background: rgba(149,165,166,0.15); border: 1px solid rgba(149,165,166,0.3); color: #bdc3c7; }
+  .bg-water { background: rgba(52,152,219,0.15); border: 1px solid rgba(52,152,219,0.3); color: #3498db; }
+
+  /* 五行分析 */
+  .wuxing-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .wuxing-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 500px) { .wuxing-grid { grid-template-columns: repeat(3, 1fr); } }
+  .wuxing-item { text-align: center; }
+  .wuxing-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+  .wuxing-count {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .wuxing-bar-wrap {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 6px 4px;
+  }
+  .wuxing-bar { height: 100%; border-radius: 3px; transition: width 1s ease; }
+
+  /* 命盘总结 */
+  .analysis-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+    line-height: 1.85;
+  }
+  .analysis-section { margin-bottom: 20px; }
+  .analysis-section h3 {
+    font-size: 0.95rem;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+  }
+  .analysis-section p { font-size: 0.9rem; color: var(--text); line-height: 1.9; }
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    margin: 3px;
+    letter-spacing: 0.1em;
+  }
+
+  /* 大运表 */
+  .dayun-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 500px) { .dayun-grid { grid-template-columns: repeat(2, 1fr); } }
+  .dayun-item {
+    background: var(--bg-card2);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 8px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .dayun-age { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 6px; }
+  .dayun-gz { font-size: 1.5rem; font-weight: 700; }
+  .dayun-hint { font-size: 0.75rem; color: var(--text-dim); margin-top: 6px; }
+
+  /* 纳音 */
+  .nayin-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    font-size: 0.88rem;
+  }
+  .nayin-pillar { color: var(--gold); min-width: 50px; font-weight: 600; }
+  .nayin-name { flex: 1; }
+  .nayin-meaning { color: var(--text-dim); font-size: 0.82rem; }
+
+  /* 用神 */
+  .yongshen-box {
+    background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03));
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .yongshen-label { font-size: 0.8rem; color: var(--text-dim); letter-spacing: 0.2em; margin-bottom: 8px; }
+  .yongshen-value { font-size: 1.8rem; font-weight: 700; }
+
+  footer {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    border-top: 1px solid rgba(201,168,76,0.1);
+    letter-spacing: 0.15em;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent);
+    margin: 30px 0;
+  }
+
+  .info-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .info-badge {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+  .info-badge span { color: var(--gold); }
+
+  .lucky-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+  }
+  @media (max-width: 500px) { .lucky-grid { grid-template-columns: repeat(2, 1fr); } }
+  .lucky-item {
+    background: var(--bg-card2);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+  .lucky-item .l-label { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 6px; }
+  .lucky-item .l-value { font-size: 0.9rem; font-weight: 600; }
+
+  /* 姓名测试 */
+  .name-score {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(201,168,76,0.05));
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  .name-score .score {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    margin: 10px 0;
+  }
+  .name-score .score-label {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+  }
+
+  /* 抽签 */
+  .sign-container {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .sign-stick {
+    width: 200px;
+    height: 300px;
+    margin: 0 auto 30px;
+    background: linear-gradient(180deg, var(--gold-dark), var(--gold));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #0d0a06;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .sign-stick:hover { transform: translateY(-5px); }
+  .sign-stick::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+  }
+  @keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+  }
+
+  .sign-result {
+    background: var(--bg-card);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: left;
+  }
+  .sign-number {
+    text-align: center;
+    font-size: 2rem;
+    color: var(--gold);
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+
+  /* 卦象 */
+  .gua-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+  }
+  .gua-item {
+    text-align: center;
+  }
+  .gua-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  .gua-line {
+    width: 100px;
+    height: 12px;
+    background: var(--gold);
+    border-radius: 2px;
+    position: relative;
+  }
+  .gua-line.broken::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 100%;
+    background: var(--bg-dark);
+  }
+  .gua-name {
+    font-size: 1.5rem;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  .gua-label {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  /* 合婚 */
+  .match-score-ring {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+  .match-score-ring svg {
+    transform: rotate(-90deg);
+  }
+  .match-score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .match-score-text .score {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .match-score-text .label {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-top: 5px;
+  }
+
+  /* Grid布局 */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo-symbol">☯</span>
+  <h1>紫微星阁</h1>
+  <p>生辰八字 · 命理推算 · 五行分析 · 周易占卜</p>
+</header>
+
+<nav class="nav-tabs">
+  <div class="nav-tab active" onclick="switchTab('bazi')">✦ 八字排盘</div>
+  <div class="nav-tab" onclick="switchTab('name')">✦ 姓名测试</div>
+  <div class="nav-tab" onclick="switchTab('sign')">✦ 观音灵签</div>
+  <div class="nav-tab" onclick="switchTab('yijing')">✦ 周易占卜</div>
+  <div class="nav-tab" onclick="switchTab('marriage')">✦ 合婚测算</div>
+  <div class="nav-tab" onclick="switchTab('shengxiao')">✦ 生肖运势</div>
+  <div class="nav-tab" onclick="switchTab('phone')">✦ 号码吉凶</div>
+  <div class="nav-tab" onclick="switchTab('huangli')">✦ 黄历查询</div>
+</nav>
+
+<main>
+
+<!-- 八字排盘 -->
+<div id="bazi" class="section active">
+  <div class="form-card">
+    <div class="form-title">✦ 输入出生信息</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>出生年份</label>
+        <input type="number" id="year" placeholder="如：1990" min="1900" max="2100">
+      </div>
+      <div class="form-group">
+        <label>出生月份</label>
+        <select id="month">
+          <option value="">请选择</option>
+          <option value="1">一月</option><option value="2">二月</option>
+          <option value="3">三月</option><option value="4">四月</option>
+          <option value="5">五月</option><option value="6">六月</option>
+          <option value="7">七月</option><option value="8">八月</option>
+          <option value="9">九月</option><option value="10">十月</option>
+          <option value="11">十一月</option><option value="12">十二月</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>出生日期</label>
+        <input type="number" id="day" placeholder="1-31" min="1" max="31">
+      </div>
+      <div class="form-group">
+        <label>出生时辰</label>
+        <select id="hour">
+          <option value="">请选择</option>
+          <option value="23">子时 23:00-01:00</option>
+          <option value="1">丑时 01:00-03:00</option>
+          <option value="3">寅时 03:00-05:00</option>
+          <option value="5">卯时 05:00-07:00</option>
+          <option value="7">辰时 07:00-09:00</option>
+          <option value="9">巳时 09:00-11:00</option>
+          <option value="11">午时 11:00-13:00</option>
+          <option value="13">未时 13:00-15:00</option>
+          <option value="15">申时 15:00-17:00</option>
+          <option value="17">酉时 17:00-19:00</option>
+          <option value="19">戌时 19:00-21:00</option>
+          <option value="21">亥时 21:00-23:00</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>性别</label>
+        <select id="gender">
+          <option value="male">男</option>
+          <option value="female">女</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>姓名（可选）</label>
+        <input type="text" id="baziName" placeholder="可留空">
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calculateBazi()">✦ 起卦排盘 ✦</button>
+  </div>
+
+  <div id="baziResults" class="results-box">
+    <!-- 八字结果动态生成 -->
+  </div>
+</div>
+
+<!-- 姓名测试 -->
+<div id="name" class="section">
+  <div class="form-card">
+    <div class="form-title">✦ 姓名测试打分</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>姓氏</label>
+        <input type="text" id="surname" placeholder="如：张" maxlength="2">
+      </div>
+      <div class="form-group">
+        <label>名字</label>
+        <input type="text" id="givenName" placeholder="如：伟" maxlength="4">
+      </div>
+      <div class="form-group">
+        <label>性别</label>
+        <select id="nameGender">
+          <option value="male">男</option>
+          <option value="female">女</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calculateName()">✦ 开始测算 ✦</button>
+  </div>
+  <div id="nameResults" class="results-box"></div>
+</div>
+
+<!-- 观音灵签 -->
+<div id="sign" class="section">
+  <div class="form-card">
+    <div class="form-title">✦ 观音灵签</div>
+    <p style="text-align:center;color:var(--text-dim);margin-bottom:20px;">
+      诚心祈愿，默念所求之事，点击签筒抽签
+    </p>
+    <div class="sign-container">
+      <div class="sign-stick" onclick="drawSign()" id="signStick">
+        <span>签筒</span>
+      </div>
+    </div>
+  </div>
+  <div id="signResults" class="results-box"></div>
+</div>
+
+<!-- 周易占卜 -->
+<div id="yijing" class="section">
+  <div class="form-card">
+    <div class="form-title">✦ 周易六爻占卜</div>
+    <div class="form-group">
+      <label>所占何事</label>
+      <textarea id="yijingQuestion" placeholder="请输入您要占卜的问题，如：事业发展、感情婚姻、健康运势等..." rows="3"></textarea>
+    </div>
+    <button class="btn-calc" onclick="calculateYijing()">✦ 起卦占卜 ✦</button>
+  </div>
+  <div id="yijingResults" class="results-box"></div>
+</div>
+
+<!-- 合婚测算 -->
+<div id="marriage" class="section">
+  <div class="form-card">
+    <div class="form-title">✦ 八字合婚</div>
+    <div class="grid-2">
+      <div>
+        <h3 style="color:var(--gold);margin-bottom:15px;">男方信息</h3>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>出生年</label>
+          <input type="number" id="maleYear" placeholder="1990" min="1900" max="2100">
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>出生月</label>
+          <input type="number" id="maleMonth" placeholder="1-12" min="1" max="12">
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>出生日</label>
+          <input type="number" id="maleDay" placeholder="1-31" min="1" max="31">
+        </div>
+        <div class="form-group">
+          <label>出生时辰</label>
+          <select id="maleHour">
+            <option value="0">子时</option><option value="2">丑时</option>
+            <option value="4">寅时</option><option value="6">卯时</option>
+            <option value="8">辰时</option><option value="10">巳时</option>
+            <option value="12">午时</option><option value="14">未时</option>
+            <option value="16">申时</option><option value="18">酉时</option>
+            <option value="20">戌时</option><option value="22">亥时</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <h3 style="color:var(--gold);margin-bottom:15px;">女方信息</h3>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>出生年</label>
+          <input type="number" id="femaleYear" placeholder="1992" min="1900" max="2100">
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>出生月</label>
+          <input type="number" id="femaleMonth" placeholder="1-12" min="1" max="12">
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>出生日</label>
+          <input type="number" id="femaleDay" placeholder="1-31" min="1" max="31">
+        </div>
+        <div class="form-group">
+          <label>出生时辰</label>
+          <select id="femaleHour">
+            <option value="0">子时</option><option value="2">丑时</option>
+            <option value="4">寅时</option><option value="6">卯时</option>
+            <option value="8">辰时</option><option value="10">巳时</option>
+            <option value="12">午时</option><option value="14">未时</option>
+            <option value="16">申时</option><option value="18">酉时</option>
+            <option value="20">戌时</option><option value="22">亥时</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calculateMarriage()">✦ 合婚测算 ✦</button>
+  </div>
+  <div id="marriageResults" class="results-box"></div>
+</div>
+
+<!-- 生肖运势 -->
+<div id="shengxiao" class="section">
+  <div class="form-card">
+    <div class="form-title">✦ 生肖运势查询</div>
+    <div class="form-group">
+      <label>选择生肖</label>
+      <select id="shengxiaoSelect">
+        <option value="鼠">鼠</option><option value="牛">牛</option>
+        <option value="虎">虎</option><option value="兔">兔</option>
+        <option value="龙">龙</option><option value="蛇">蛇</option>
+        <option value="马">马</option><option value="羊">羊</option>
+        <option value="猴">猴</option><option value="鸡">鸡</option>
+        <option value="狗">狗</option><option value="猪">猪</option>
+      </select>
+    </div>
+    <button class="btn-calc" onclick="calculateShengxiao()">✦ 查看运势 ✦</button>
+  </div>
+  <div id="shengxiaoResults" class="results-box"></div>
+</div>
+
+<!-- 号码吉凶 -->
+<div id="phone" class="section">
+  <div class="form-card">
+    <div class="form-title">✦ 手机号码吉凶</div>
+    <div class="form-group">
+      <label>输入手机号码</label>
+      <input type="text" id="phoneNumber" placeholder="请输入11位手机号" maxlength="11">
+    </div>
+    <button class="btn-calc" onclick="calculatePhone()">✦ 测算吉凶 ✦</button>
+  </div>
+  <div id="phoneResults" class="results-box"></div>
+</div>
+
+<!-- 黄历查询 -->
+<div id="huangli" class="section">
+  <div class="form-card">
+    <div class="form-title">✦ 黄历查询</div>
+    <div class="form-group">
+      <label>选择日期</label>
+      <input type="date" id="huangliDate">
+    </div>
+    <button class="btn-calc" onclick="calculateHuangli()">✦ 查看黄历 ✦</button>
+  </div>
+  <div id="huangliResults" class="results-box"></div>
+</div>
+
+</main>
+
+<footer>紫微星阁 · 传统命理文化传承 · 仅供参考娱乐</footer>
+
+<script src="bazi-calculator.js"></script>
+<script>
+function switchTab(tabName) {
+  // 切换导航
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  // 切换内容
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+}
+
+// 今天日期默认值
+document.getElementById('huangliDate').valueAsDate = new Date();
+</script>
+</body>
+</html>
